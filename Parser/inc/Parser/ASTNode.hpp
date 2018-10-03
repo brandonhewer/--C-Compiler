@@ -17,6 +17,10 @@ struct ASTNode {
   std::unique_ptr<ASTNode> right;
 };
 
+std::unique_ptr<ASTNode> make_node(Token const &);
+std::unique_ptr<ASTNode> make_node(Token const &, std::unique_ptr<ASTNode>,
+                                   std::unique_ptr<ASTNode>);
+
 } // namespace Parser
 
 #endif

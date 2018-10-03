@@ -32,6 +32,19 @@ enum class Operators {
   AMPERSAND
 };
 
+enum class MetaOperators {
+  DECLARE,
+  DECLARE_FUNCTION,
+  DEFINE_FUNCTION,
+  DEFINE_FUNCTION_HEADER,
+  DEFINE_FUNCTION_CALL_INTERFACE,
+  DECLARE_ABSTRACT,
+  COMPOSE_TYPE_SPECIFIERS,
+  COMPOUND_STATEMENTS,
+  SEPARATE,
+  ADD_TO_TRANSLATION_UNIT
+};
+
 enum class Comparators {
   EQUALS,
   DOES_NOT_EQUAL,
@@ -41,21 +54,17 @@ enum class Comparators {
   GREATER_THAN
 };
 
-enum class Punctuation {
-  LEFT_PARENTHESES,
-  RIGHT_PARENTHESES,
-  LEFT_BRACKET,
-  RIGHT_BRACKET,
-  COMMA,
-  SEMICOLON
-};
-
 struct Identifier {
   std::string value;
 };
 
-using Token = std::variant<Keywords, Operators, Comparators, Punctuation,
-                           Identifier const *const, int, std::string>;
+struct Pointer {
+  int depth;
+};
+
+using Token =
+    std::variant<Keywords, Operators, MetaOperators, Comparators,
+                 Pointer, Identifier const *const, int, std::string>;
 
 } // namespace Parser
 

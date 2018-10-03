@@ -1,3 +1,6 @@
+%option reentrant
+%option c++
+
 D			[0-9]
 L			[a-zA-Z_]
 H			[a-fA-F0-9]
@@ -15,7 +18,7 @@ IS			(u|U|l|L)*
 
 using namespace Parser;
 
-Token make_int(char*);
+int make_int(char *s);
 void count(void);
 void comment(void);
 %}
@@ -23,45 +26,45 @@ void comment(void);
 %%
 "/*"			{ comment(); }
 
-"auto"			{ count(); return Keyword::AUTO; }
-"break"			{ count(); return Keyword::BREAK; }
-"continue"		{ count(); return Keyword::CONTINUE; }
-"else"			{ count(); return Keyword::ELSE; }
-"extern"		{ count(); return Keyword::EXTERN; }
-"if"			{ count(); return Keyword::IF; }
-"int"			{ count(); return Keyword::INT; }
-"function"		{ count(); return Keyword::FUNCTION; }
-"return"		{ count(); return Keyword::RETURN; }
-"void"			{ count(); return Keyword::VOID; }
-"while"			{ count(); return Keyword::WHILE; }
+"auto"			  { count(); return Keywords::AUTO; }
+"break"			  { count(); return Keywords::BREAK; }
+"continue"		{ count(); return Keywords::CONTINUE; }
+"else"			  { count(); return Keywords::ELSE; }
+"extern"		  { count(); return Keywords::EXTERN; }
+"if"			    { count(); return Keywords::IF; }
+"int"			    { count(); return Keywords::INT; }
+"function"		{ count(); return Keywords::FUNCTION; }
+"return"		  { count(); return Keywords::RETURN; }
+"void"			  { count(); return Keywords::VOID; }
+"while"			  { count(); return Keywords::WHILE; }
 
-{L}({L}|{D})*		{ count(); return Identifier{yytext}; }
+{L}({L}|{D})*		{ count(); yylval = yytext; return IDENTIFIER; }
 
-{D}+{IS}?		    { count(); return make_int(yytext); }
-L?'(\\.|[^\\'])+'	{ count(); return make_int(yytext); }
+{D}+{IS}?		      { count(); yylval = make_int(yytext); return CONSTANT; }
+L?'(\\.|[^\\'])+'	{ count(); return CONSTANT; }
 
-L?\"(\\.|[^\\"])*\"	{ count(); return yytext; }
+L?\"(\\.|[^\\"])*\"	{ count(); yylval = make_int(yytext); return STRING_LITERAL; }
 
 "<="		{ count(); return Comparators::LESS_THAN_OR_EQUAL_TO; }
 ">="		{ count(); return Comparators::GREATER_THAN_OR_EQUAL_TO; }
 "=="		{ count(); return Comparators::EQUALS; }
-"!="		{ count(); return Comparators::NOT_EQUAL; }
-"<"			{ count(); return Comparators::LESS_THAN; }
-">"			{ count(); return Comparators::GREATER_THAN; }
-";"			{ count(); return Punctuation::SEMICOLON; }
-"{"     	{ count(); return Punctuation::LEFT_PARENTHESES; }
-"}"     	{ count(); return Punctuation::RIGHT_PARENTHESES; }
-","			{ count(); return Punctuation::COMMA; }
-":"			{ count(); return Punctuation::COLON; }
-"("			{ count(); return Punctuation::LEFT_BRACKET; }
-")"			{ count(); return Punctuation::RIGHT_BRACKET; }
+"!="		{ count(); return Comparators::DOES_NOT_EQUAL; }
 "="			{ count(); return Operators::ASSIGNMENT; }
 "!"			{ count(); return Operators::INVERSION; }
 "-"			{ count(); return Operators::MINUS; }
 "+"			{ count(); return Operators::PLUS; }
-"*"			{ count(); return Operators::MULTIPLY; }
+"*"			{ count(); return Operators::ASTERIX; }
 "/"			{ count(); return Operators::DIVIDE; }
 "%"			{ count(); return Operators::MODULO; }
+"<"			{ count(); return Comparators::LESS_THAN; }
+">"			{ count(); return Comparators::GREATER_THAN; }
+"("			{ count(); return '('; }
+")"			{ count(); return ')'; }
+";"			{ count(); return ';'; }
+"{"     { count(); return '{'; }
+"}"     { count(); return '}'; }
+","			{ count(); return ','; }
+":"			{ count(); return ':'; }
 
 [ \t\v\n\f]		{ count(); }
 .				{ /* ignore bad characters */ }
@@ -107,6 +110,6 @@ void count() {
 	ECHO;
 }
 
-Token make_int(char *s) {
+int make_int(char *s) {
   return *s!='\'' ? atoi(s) : *(s+1);
 }
