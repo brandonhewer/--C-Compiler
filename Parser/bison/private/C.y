@@ -8,7 +8,6 @@
 
 #include <unordered_map>
 
-#define YYSTYPE std::unique_ptr<ASTNode>
 #define YYDEBUG 1
 
 using namespace Parser;
