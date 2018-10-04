@@ -1,5 +1,5 @@
 #include "Parser/ASTNode.hpp"
-#include "Parser/C.tab.h"
+#include "Parser/Parser.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

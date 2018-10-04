@@ -1,17 +1,20 @@
-%define "api.value.type" "variant"
-%define "api.token.constructor"
-%define "api.pure" "full"
+%define api.value.type variant
+%define api.token.constructor
+
+%skeleton "lalr1.cc"
 
 %code requires {
 #include "Parser/ASTNode.hpp"
 
-#define YYSTYPE std::unique_ptr<ASTNode>
+#include <unordered_map>
+
 #define YYDEBUG 1
+
+using namespace Parser;
 
 std::unique_ptr<ASTNode> make_identifier(
     std::string const &s, std::unordered_map<std::string, Token> &symbols);
 }
-%}
 
 %param { std::unique_ptr<ASTNode> tree }
 %param { std::unordered_map<std::string, Token> &symbols }
@@ -19,6 +22,49 @@ std::unique_ptr<ASTNode> make_identifier(
 %token <std::string> IDENTIFIER;
 %token <std::string> STRING_LITERAL;
 %token <int> CONSTANT;
+
+%token LE_OP GE_OP NE_OP EQ_OP;
+%token EXTERN AUTO
+%token INT VOID FUNCTION
+%token APPLY LEAF
+%token IF ELSE WHILE CONTINUE BREAK RETURN
+
+%type <std::unique_ptr<ASTNode>> goal
+                                 primary_expression 
+                                 postfix_expression 
+                                 argument_expression_list 
+                                 unary_expression
+                                 multiplicative_expression 
+                                 additive_expression
+                                 relational_expression 
+                                 equality_expression
+                                 assignment_expression 
+                                 expression
+                                 declaration
+                                 declaration_specifiers 
+                                 init_declarator_list
+                                 init_declarator 
+                                 storage_class_specifier
+                                 type_specifier 
+                                 declarator 
+                                 direct_declarator 
+                                 parameter_list 
+                                 parameter_declaration
+                                 identifier_list 
+                                 abstract_declarator
+                                 direct_abstract_declarator 
+                                 statement
+                                 compound_statement 
+                                 declaration_list
+                                 statement_list
+                                 expression_statement
+                                 selection_statement
+                                 iteration_statement
+                                 jump_statement
+                                 translation_unit
+                                 external_declaration
+                                 function_definition;
+%type <Token> unary_operator pointer;
 
 %start goal
 %%
@@ -65,78 +111,80 @@ unary_expression
   ;
 
 unary_operator
-  : Operators::AMPERSAND   { $$ = $1; }
-  | Operators::MULTIPLY    { $$ = $1; }
-  | Operators::PLUS		     { $$ = $1; }
-  | Operators::MINUS		   { $$ = $1; }
-  | Operators::INVERSION	 { $$ = $1; }
+  : '&'   { $$ = Operators::AMPERSAND; }
+  | '*'   { $$ = Operators::MULTIPLY; }
+  | '+'		{ $$ = Operators::PLUS; }
+  | '-'		{ $$ = Operators::MINUS; }
+  | '!'	  { $$ = Operators::INVERSION; }
   ;
 
 multiplicative_expression
 	: unary_expression		{ $$ = std::move($1); }
-	| multiplicative_expression Operators::MULTIPLY unary_expression 
+	| multiplicative_expression '*' unary_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::MULTIPLY, std::move($1), std::move($3)); 
       }
-	| multiplicative_expression Operators::DIVIDE unary_expression 
+	| multiplicative_expression '/' unary_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::DIVIDE, std::move($1), std::move($3)); 
       }
-	| multiplicative_expression Operators::MODULO unary_expression 
+	| multiplicative_expression '%' unary_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::MODULO, std::move($1), std::move($3)); 
       }
 	;
 
 additive_expression
 	: multiplicative_expression		{ $$ = std::move($1); }
-	| additive_expression Operators::PLUS multiplicative_expression 
+	| additive_expression '+' multiplicative_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::PLUS, std::move($1), std::move($3)); 
       }
-	| additive_expression Operators::MINUS multiplicative_expression 
+	| additive_expression '-' multiplicative_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::MINUS, std::move($1), std::move($3)); 
       }
 	;
 
 relational_expression
 	: additive_expression		{ $$ = std::move($1); }
-	| relational_expression Comparators::LESS_THAN additive_expression	
+	| relational_expression '<' additive_expression	
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::LESS_THAN, std::move($1), std::move($3)); 
       }
-	| relational_expression Comparators::GREATER_THAN additive_expression 
+	| relational_expression '>' additive_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::GREATER_THAN, std::move($1), std::move($3)); 
       }
-	| relational_expression Comparators::LESS_THAN_OR_EQUAL_TO additive_expression 
+	| relational_expression LE_OP additive_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::LESS_THAN_OR_EQUAL_TO, 
+                       std::move($1), std::move($3)); 
       }
-	| relational_expression Comparators::GREATER_THAN_OR_EQUAL_TO additive_expression 
+	| relational_expression GE_OP additive_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::GREATER_THAN_OR_EQUAL_TO, 
+                       std::move($1), std::move($3)); 
       }
 	;
 
 equality_expression
 	: relational_expression		{ $$ = std::move($1); }
-	| equality_expression Operators::EQUALS relational_expression 
+	| equality_expression '=' relational_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::ASSIGNMENT, std::move($1), std::move($3)); 
       }
-	| equality_expression Operators::NOT_EQUAL relational_expression 
+	| equality_expression NE_OP relational_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::NOT_EQUAL, std::move($1), std::move($3)); 
       }
 	;
 
 assignment_expression
 	: equality_expression		{ $$ = std::move($1); }
-	| unary_expression Comparators::EQUALS assignment_expression 
+	| unary_expression EQ_OP assignment_expression 
       {
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Comparators::EQUALS, std::move($1), std::move($3)); 
       }
 	;
 
@@ -182,26 +230,28 @@ init_declarator_list
 
 init_declarator
 	: declarator		{ $$ = std::move($1); }
-	| declarator Operators::ASSIGNMENT assignment_expression 
+	| declarator '=' assignment_expression 
       { 
-        $$ = make_node($2, std::move($1), std::move($3)); 
+        $$ = make_node(Operators::ASSIGNMENT, std::move($1), std::move($3)); 
       }
 	;
 
 storage_class_specifier
-	: Keywords::EXTERN	{ $$ = $1; }
-	| Keywords::AUTO		{ $$ = $1; }
+	: EXTERN	{ $$ = make_node(Keywords::EXTERN); }
+	| AUTO		{ $$ = make_node(Keywords::AUTO); }
 	;
 
 type_specifier
-	: Keywords::VOID		  { $$ = make_node($1); }
-	| Keywords::INT		    { $$ = make_node($1); }
-	| Keywords::FUNCTION	{ $$ = make_node($1); }
+	: VOID		  { $$ = make_node(Keywords::VOID); }
+	| INT		    { $$ = make_node(Keywords::INT); }
+	| FUNCTION	{ $$ = make_node(Keywords::FUNCTION); }
 	;
 
 declarator
-	: pointer direct_declarator	{ 
-        $$ = make_node(MetaOperators::POINTS_TO, std::move($1), std::move($2)); }
+	: pointer direct_declarator	
+      { 
+        $$ = make_node(MetaOperators::POINTS_TO, std::move($1), std::move($2)); 
+      }
 	| direct_declarator		{ $$ = std::move($1); }
 	;
 
@@ -229,7 +279,7 @@ direct_declarator
 
 pointer
 	: '*'                   { $$ = Pointer{1}; }
-	| '*' pointer           { $$ = Pointer{$1.depth}; }
+	| '*' pointer           { $$ = Pointer{$2.depth}; }
 	;
 
 parameter_list
@@ -326,29 +376,41 @@ expression_statement
 	;
 
 selection_statement
-	: Keywords::IF '(' expression ')' statement 
+	: IF '(' expression ')' statement 
       { 
-        $$ = make_node($1, std::move($3), std::move($5)); 
+        $$ = make_node(Keywords::IF, std::move($3), std::move($5)); 
       }
-	| Keywords::IF '(' expression ')' statement Keywords::ELSE statement
+	| IF '(' expression ')' statement ELSE statement
       { 
-        $$ = make_node($1, std::move($3), 
-                       make_node($6, std::move($5), std::move($7))); 
+        $$ = make_node(Keywords::IF, std::move($3), 
+                       make_node(Keywords::ELSE, std::move($5), std::move($7))); 
       }
 	;
 
 iteration_statement
-	: Keywords::WHILE '(' expression ')' statement 
+	: WHILE '(' expression ')' statement 
       { 
-        $$ = make_node($1, std::move($3), std::move($5)); 
+        $$ = make_node(Keywords::WHILE, std::move($3), std::move($5)); 
       }
 	;
 
 jump_statement
-	: Keywords::CONTINUE ';'          { $$ = make_node($1, nullptr, nullptr); }
-	| Keywords::BREAK ';'             { $$ = make_node($1, nullptr, nullptr); }
-	| Keywords::RETURN ';'	          { $$ = make_node($1, nullptr, nullptr); }
-	| Keywords::RETURN expression ';' { $$ = make_node($1, std::move($2), nullptr); }
+	: CONTINUE ';'          
+      { 
+        $$ = make_node(Keywords::CONTINUE, nullptr, nullptr); 
+      }
+	| BREAK ';'             
+      { 
+        $$ = make_node(Keywords::BREAK, nullptr, nullptr); 
+      }
+	| RETURN ';'	          
+      { 
+        $$ = make_node(Keywords::RETURN, nullptr, nullptr); 
+      }
+	| RETURN expression ';' 
+      { 
+        $$ = make_node(Keywords::RETURN, std::move($2), nullptr); 
+      }
 	;
 
 translation_unit

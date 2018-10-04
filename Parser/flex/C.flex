@@ -1,4 +1,3 @@
-%option reentrant
 %option c++
 
 D			[0-9]
@@ -9,12 +8,10 @@ FS			(f|F|l|L)
 IS			(u|U|l|L)*
 
 %{
-#include "Parser/C.tab.h"
+#include "Parser/Parser.h"
 #include "Parser/Token.hpp"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <string>
 
 using namespace Parser;
 
@@ -26,17 +23,17 @@ void comment(void);
 %%
 "/*"			{ comment(); }
 
-"auto"			  { count(); return Keywords::AUTO; }
-"break"			  { count(); return Keywords::BREAK; }
-"continue"		{ count(); return Keywords::CONTINUE; }
-"else"			  { count(); return Keywords::ELSE; }
-"extern"		  { count(); return Keywords::EXTERN; }
-"if"			    { count(); return Keywords::IF; }
-"int"			    { count(); return Keywords::INT; }
-"function"		{ count(); return Keywords::FUNCTION; }
-"return"		  { count(); return Keywords::RETURN; }
-"void"			  { count(); return Keywords::VOID; }
-"while"			  { count(); return Keywords::WHILE; }
+"auto"			  { count(); return AUTO; }
+"break"			  { count(); return BREAK; }
+"continue"		{ count(); return CONTINUE; }
+"else"			  { count(); return ELSE; }
+"extern"		  { count(); return EXTERN; }
+"if"			    { count(); return IF; }
+"int"			    { count(); return INT; }
+"function"		{ count(); return FUNCTION; }
+"return"		  { count(); return RETURN; }
+"void"			  { count(); return VOID; }
+"while"			  { count(); return WHILE; }
 
 {L}({L}|{D})*		{ count(); yylval = yytext; return IDENTIFIER; }
 
@@ -45,19 +42,19 @@ L?'(\\.|[^\\'])+'	{ count(); return CONSTANT; }
 
 L?\"(\\.|[^\\"])*\"	{ count(); yylval = make_int(yytext); return STRING_LITERAL; }
 
-"<="		{ count(); return Comparators::LESS_THAN_OR_EQUAL_TO; }
-">="		{ count(); return Comparators::GREATER_THAN_OR_EQUAL_TO; }
-"=="		{ count(); return Comparators::EQUALS; }
-"!="		{ count(); return Comparators::DOES_NOT_EQUAL; }
-"="			{ count(); return Operators::ASSIGNMENT; }
-"!"			{ count(); return Operators::INVERSION; }
-"-"			{ count(); return Operators::MINUS; }
-"+"			{ count(); return Operators::PLUS; }
-"*"			{ count(); return Operators::ASTERIX; }
-"/"			{ count(); return Operators::DIVIDE; }
-"%"			{ count(); return Operators::MODULO; }
-"<"			{ count(); return Comparators::LESS_THAN; }
-">"			{ count(); return Comparators::GREATER_THAN; }
+"<="		{ count(); return LE_OP; }
+">="		{ count(); return GE_OP; }
+"=="		{ count(); return EQ_OP }
+"!="		{ count(); return NE_OP; }
+"="			{ count(); return '='; }
+"!"			{ count(); return '!'; }
+"-"			{ count(); return '-'; }
+"+"			{ count(); return '+'; }
+"*"			{ count(); return '*'; }
+"/"			{ count(); return '/'; }
+"%"			{ count(); return '%'; }
+"<"			{ count(); return '<'; }
+">"			{ count(); return '>'; }
 "("			{ count(); return '('; }
 ")"			{ count(); return ')'; }
 ";"			{ count(); return ';'; }
