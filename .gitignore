@@ -1,9 +1,2 @@
 .DS_Store
 /.vscode/
-
-C.tab.cpp
-C.output
-stack.hh
-Parser.hpp
-Scanner.hpp
-lex.yy.cpp
