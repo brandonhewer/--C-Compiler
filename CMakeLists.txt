@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(--CCompiler)
 
-find_package(BOOST REQUIRED)
+find_package(Boost 1.67.0 REQUIRED COMPONENTS system)
 
 include (AddGTest)
 
 enable_testing()
 
 add_subdirectory(Parser)
+add_subdirectory(Interpreter)

@@ -1,0 +1,67 @@
+#ifndef __TAGS_HPP_
+#define __TAGS_HPP_
+
+#include "Parser/Annotation/DefaultAnnotation.hpp"
+#include "Parser/Annotation/PrintAnnotation.hpp"
+
+namespace Parser {
+namespace Grammar {
+
+CREATE_PRINT_ANNOTATOR(primary_expression)
+CREATE_DEFAULT_ANNOTATOR(function_application)
+CREATE_PRINT_ANNOTATOR(postfix_expression)
+CREATE_DEFAULT_ANNOTATOR(argument_expression_list)
+CREATE_DEFAULT_ANNOTATOR(argument_expression_lists)
+CREATE_PRINT_ANNOTATOR(unary_expression)
+CREATE_DEFAULT_ANNOTATOR(multiply)
+CREATE_DEFAULT_ANNOTATOR(divide)
+CREATE_DEFAULT_ANNOTATOR(modulo)
+CREATE_PRINT_ANNOTATOR(multiplicative_expression)
+CREATE_DEFAULT_ANNOTATOR(addition)
+CREATE_DEFAULT_ANNOTATOR(subtraction)
+CREATE_DEFAULT_ANNOTATOR(less_than)
+CREATE_DEFAULT_ANNOTATOR(less_than_or_equal_to)
+CREATE_DEFAULT_ANNOTATOR(greater_than)
+CREATE_DEFAULT_ANNOTATOR(greater_than_or_equal_to)
+CREATE_DEFAULT_ANNOTATOR(additive_expression)
+CREATE_PRINT_ANNOTATOR(relational_expression)
+CREATE_DEFAULT_ANNOTATOR(equality_check)
+CREATE_DEFAULT_ANNOTATOR(not_equal)
+CREATE_PRINT_ANNOTATOR(equality_expression)
+CREATE_PRINT_ANNOTATOR(assignment)
+CREATE_PRINT_ANNOTATOR(assignment_expression)
+CREATE_PRINT_ANNOTATOR(expression)
+CREATE_DEFAULT_ANNOTATOR(declaration_specifier)
+CREATE_DEFAULT_ANNOTATOR(declaration_specifiers)
+CREATE_DEFAULT_ANNOTATOR(declaration_specifiers_or_none)
+CREATE_DEFAULT_ANNOTATOR(init_declarator_list)
+CREATE_DEFAULT_ANNOTATOR(variable_initializer)
+CREATE_DEFAULT_ANNOTATOR(declaration)
+CREATE_DEFAULT_ANNOTATOR(init_declarator)
+CREATE_DEFAULT_ANNOTATOR(parameters_or_identifiers)
+CREATE_DEFAULT_ANNOTATOR(function_declarator)
+CREATE_DEFAULT_ANNOTATOR(declarator)
+CREATE_DEFAULT_ANNOTATOR(parameter_list)
+CREATE_DEFAULT_ANNOTATOR(direct_or_abstract_declarator)
+CREATE_DEFAULT_ANNOTATOR(parameter_declaration)
+CREATE_DEFAULT_ANNOTATOR(identifier_list)
+CREATE_DEFAULT_ANNOTATOR(abstract_declarator)
+CREATE_DEFAULT_ANNOTATOR(direct_abstract_declarator)
+CREATE_DEFAULT_ANNOTATOR(statement)
+CREATE_DEFAULT_ANNOTATOR(compound_statement)
+CREATE_DEFAULT_ANNOTATOR(declaration_list)
+CREATE_DEFAULT_ANNOTATOR(statement_list)
+CREATE_DEFAULT_ANNOTATOR(expression_statement)
+CREATE_DEFAULT_ANNOTATOR(if_statement)
+CREATE_DEFAULT_ANNOTATOR(if_else_statement)
+CREATE_DEFAULT_ANNOTATOR(iteration_statement)
+CREATE_DEFAULT_ANNOTATOR(return_statement)
+CREATE_DEFAULT_ANNOTATOR(jump_statement)
+CREATE_DEFAULT_ANNOTATOR(function_definition)
+CREATE_DEFAULT_ANNOTATOR(external_declaration)
+CREATE_DEFAULT_ANNOTATOR(translation_unit)
+
+} // namespace Grammar
+} // namespace Parser
+
+#endif
