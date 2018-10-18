@@ -138,23 +138,7 @@ struct StatementToNormal : public boost::static_visitor<> {
   }
 };
 
-struct AddNormalDeclaration : boost::static_visitor<> {
-
-  template <typename... Ts>
-  void operator()(std::vector<Ts...> &output,
-                  VariableInitializer const &variable_initializer) {
-    add_a_normal_variable_initializer(variable_initializer, output);
-  }
-
-  template <typename... Ts>
-  void
-  operator()(std::vector<Ts...> &output,
-             x3::forward_ast<FunctionDefinition> const &function_definition) {
-    add_a_normal_function_definition(function_definition.get(), output);
-  }
-};
-
-struct DeclarationOrStatementToNormal : public boost::static_visitor<> {
+struct DeclarationStatementOrFunctionToNormal : public boost::static_visitor<> {
 
   template <typename Vector>
   void operator()(Vector &output, Declaration const &declaration) const {
@@ -166,15 +150,21 @@ struct DeclarationOrStatementToNormal : public boost::static_visitor<> {
                   x3::forward_ast<Statement> const &statement) const {
     add_a_normal_statement(statement.get(), output);
   }
+
+  template <typename Vector>
+  void operator()(Vector &output, FunctionDefinition const &definition) const {
+    add_a_normal_function_definition(definition, output);
+  }
 };
 
 template <typename Vector>
-void add_a_normal_declaration_or_statement(
-    DeclarationOrStatement const &declaration_or_statement, Vector &output) {
-  auto normal_declaration_or_statement =
-      boost::bind(DeclarationOrStatementToNormal(), boost::ref(output), _1);
-  boost::apply_visitor(normal_declaration_or_statement,
-                       declaration_or_statement);
+void add_a_normal_declaration_statement_or_function(
+    DeclarationStatementOrFunction const &declaration_statement_or_function,
+    Vector &output) {
+  auto normal_declaration_statement_or_function = boost::bind(
+      DeclarationStatementOrFunctionToNormal(), boost::ref(output), _1);
+  boost::apply_visitor(normal_declaration_statement_or_function,
+                       declaration_statement_or_function);
 }
 
 } // namespace
@@ -204,14 +194,6 @@ void add_a_normal_statement(Parser::AST::Statement const &statement,
                        statement);
 }
 
-template <typename Vector>
-void add_a_normal_declaration(Parser::AST::Declaration const &declaration,
-                              Vector &output) {
-  auto add_normal_declaration =
-      boost::bind(AddNormalDeclaration(), boost::ref(output), _1);
-  boost::apply_visitor(add_normal_declaration, declaration);
-}
-
 std::unique_ptr<NormalCompoundStatement>
 create_a_normal_compound_statement(Parser::AST::Statement const &statement) {
   auto normal_statement = std::make_unique<NormalCompoundStatement>();
@@ -225,7 +207,7 @@ std::unique_ptr<NormalCompoundStatement> create_a_normal_compound_statement(
   auto &statements = normal_statement->statements;
 
   for (auto &&statement : compound_statement)
-    add_a_normal_declaration_or_statement(statement, statements);
+    add_a_normal_declaration_statement_or_function(statement, statements);
   return std::move(normal_statement);
 }
 

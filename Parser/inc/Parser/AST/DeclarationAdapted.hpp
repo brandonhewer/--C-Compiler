@@ -10,7 +10,7 @@ BOOST_FUSION_ADAPT_STRUCT(Parser::AST::FunctionDeclarator, identifier,
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::InitDeclarator, declarator, assignment)
 BOOST_FUSION_ADAPT_STRUCT(Parser::AST::ParameterDeclaration, specifiers,
                           identifier)
-BOOST_FUSION_ADAPT_STRUCT(Parser::AST::VariableInitializer, specifiers,
+BOOST_FUSION_ADAPT_STRUCT(Parser::AST::Declaration, specifiers,
                           declarators)
 
 #endif

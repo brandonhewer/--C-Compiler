@@ -37,13 +37,10 @@ struct InitDeclarator {
   boost::optional<AssignmentExpression> assignment;
 };
 
-struct VariableInitializer {
+struct Declaration {
   std::vector<DeclarationSpecifier> specifiers;
   std::vector<InitDeclarator> declarators;
 };
-
-using Declaration =
-    x3::variant<VariableInitializer, x3::forward_ast<FunctionDefinition>>;
 
 } // namespace AST
 } // namespace Parser

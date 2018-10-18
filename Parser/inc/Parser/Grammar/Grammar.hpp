@@ -1,6 +1,7 @@
 #ifndef __GRAMMAR_HPP_
 #define __GRAMMAR_HPP_
 
+#include <boost/spirit/home/x3/auxiliary.hpp>
 #include <boost/spirit/home/x3.hpp>
 
 #include "Parser/Grammar/Identifier.hpp"
@@ -119,12 +120,8 @@ auto const init_declarator_list_def
 = init_declarator >> *(COMMA >> init_declarator)
 ;
 
-auto const variable_initializer_def
-= declaration_specifiers >> init_declarator_list >> SEMICOLON
-;
-
 auto const declaration_def
-= variable_initializer | function_definition
+= declaration_specifiers >> init_declarator_list >> SEMICOLON
 ;
 
 auto const declaration_specifier_def
@@ -193,8 +190,12 @@ auto const statement_def
 | jump_statement
 ;
 
+auto const declaration_statement_or_function_def
+= function_definition | declaration | statement 
+;
+
 auto const compound_statement_def
-= LEFT_BRACE >> *(declaration | statement) >> RIGHT_BRACE
+= LEFT_BRACE >> *declaration_statement_or_function >> RIGHT_BRACE
 ;
 
 auto const statement_list_def
@@ -219,7 +220,8 @@ auto const iteration_statement_def
 
 auto const return_statement_def
 = RETURN >> expression >> SEMICOLON
-| RETURN >> SEMICOLON >> x3::attr(AST::Expression());
+| RETURN >> SEMICOLON >> x3::attr(AST::Expression())
+;
 
 auto const jump_statement_def
 = (jump_keywords >> SEMICOLON) | return_statement
@@ -269,7 +271,6 @@ BOOST_SPIRIT_DEFINE(
   declaration_specifier,
   declaration_specifiers,
   declaration_specifiers_or_none,
-  variable_initializer,
   declaration,
   identifier_in_brackets,
   init_declarator,
@@ -281,6 +282,7 @@ BOOST_SPIRIT_DEFINE(
   parameter_declaration,
   identifier_list,
   statement,
+  declaration_statement_or_function,
   compound_statement,
   statement_list,
   expression_statement,

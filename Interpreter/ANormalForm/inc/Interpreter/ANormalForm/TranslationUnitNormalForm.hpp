@@ -39,8 +39,8 @@ void add_a_normal_translation_unit(TranslationUnit const &translation_unit,
 namespace Interpreter {
 namespace ANormalForm {
 
-std::vector<NormalStatement>
-normalise_translation_unit(TranslationUnit const &translation_unit) {
+std::vector<NormalStatement> normalise_translation_unit(
+    Parser::AST::TranslationUnit const &translation_unit) {
   std::vector<NormalStatement> normalised;
   add_a_normal_translation_unit(translation_unit, normalised);
   return normalised;

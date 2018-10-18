@@ -11,4 +11,7 @@ target_link_libraries(ANormalFormTest
     gtest_main
 )
 
+target_compile_definitions(ANormalFormTest 
+  PRIVATE TEST_PATH="${CMAKE_SOURCE_DIR}/test-data")
+
 add_test(NAME ANormalFormTest COMMAND ANormalFormTest)

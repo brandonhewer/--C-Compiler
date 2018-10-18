@@ -52,8 +52,9 @@ std::string function_declarator_to_string(FunctionDeclarator const &);
 std::string declarator_to_string(Declarator const &);
 std::string init_declarator_to_string(InitDeclarator const &);
 std::string init_declarators_to_string(std::vector<InitDeclarator> const &);
-std::string variable_initializer_to_string(VariableInitializer const &);
-std::string declaration_or_statement_to_string(DeclarationOrStatement const &);
+std::string declaration_to_string(Declaration const &);
+std::string declaration_statement_or_function_to_string(
+    DeclarationStatementOrFunction const &);
 std::string declaration_to_string(Declaration const &);
 std::string declarations_to_string(std::vector<Declaration> const &);
 std::string if_to_string(If const &);
@@ -318,20 +319,7 @@ struct statement_to_string_ : public boost::static_visitor<std::string> {
 
 } statement_to_string_;
 
-struct declaration_to_string_ : public boost::static_visitor<std::string> {
-
-  std::string operator()(FunctionDefinition const &function_definition) const {
-    return function_definition_to_string(function_definition);
-  }
-
-  std::string
-  operator()(VariableInitializer const &variable_initializer) const {
-    return variable_initializer_to_string(variable_initializer);
-  }
-
-} declaration_to_string_;
-
-struct declaration_or_statement_to_string_
+struct declaration_statement_or_function_to_string_
     : public boost::static_visitor<std::string> {
 
   std::string operator()(Declaration const &declaration) const {
@@ -342,7 +330,11 @@ struct declaration_or_statement_to_string_
     return statement_to_string(statement);
   }
 
-} declaration_or_statement_to_string_;
+  std::string operator()(FunctionDefinition const &definition) const {
+    return function_definition_to_string(definition);
+  }
+
+} declaration_statement_or_function_to_string_;
 
 struct external_declaration_to_string_
     : public boost::static_visitor<std::string> {
@@ -618,20 +610,15 @@ std::string init_declarators_to_string(
   return boost::algorithm::join(declarator_strings, ",");
 }
 
-std::string variable_initializer_to_string(
-    VariableInitializer const &variable_initializer) {
-  return declaration_specifiers_to_string(variable_initializer.specifiers) +
-         " " + init_declarators_to_string(variable_initializer.declarators);
-}
-
-std::string declaration_or_statement_to_string(
-    DeclarationOrStatement const &declaration_or_statement) {
-  return boost::apply_visitor(declaration_or_statement_to_string_,
-                              declaration_or_statement);
-}
-
 std::string declaration_to_string(Declaration const &declaration) {
-  return boost::apply_visitor(declaration_to_string_, declaration);
+  return declaration_specifiers_to_string(declaration.specifiers) + " " +
+         init_declarators_to_string(declaration.declarators);
+}
+
+std::string declaration_statement_or_function_to_string(
+    DeclarationStatementOrFunction const &declaration_statement_or_function) {
+  return boost::apply_visitor(declaration_statement_or_function_to_string_,
+                              declaration_statement_or_function);
 }
 
 std::string
@@ -694,7 +681,7 @@ compound_statement_to_string(CompoundStatement const &compound_statement) {
   std::vector<std::string> strs;
   strs.reserve(compound_statement.size());
   for (auto &&statement : compound_statement)
-    strs.emplace_back(declaration_or_statement_to_string(statement));
+    strs.emplace_back(declaration_statement_or_function_to_string(statement));
   return boost::algorithm::join(strs, "\n");
 }
 

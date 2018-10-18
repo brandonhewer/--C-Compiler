@@ -30,9 +30,9 @@ struct Return {
 enum class JumpKeywords { CONTINUE, BREAK };
 using JumpStatement = x3::variant<Return, JumpKeywords>;
 
-using DeclarationOrStatement =
-    x3::variant<Declaration, x3::forward_ast<Statement>>;
-using CompoundStatement = std::vector<DeclarationOrStatement>;
+using DeclarationStatementOrFunction =
+    x3::variant<Declaration, x3::forward_ast<Statement>, FunctionDefinition>;
+using CompoundStatement = std::vector<DeclarationStatementOrFunction>;
 
 struct Statement : x3::variant<CompoundStatement, Expression, If, IfElse, While,
                                JumpStatement> {

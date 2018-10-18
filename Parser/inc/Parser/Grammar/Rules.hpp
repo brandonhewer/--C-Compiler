@@ -85,9 +85,6 @@ x3::rule<declaration_specifiers_or_none_tag,
 x3::rule<init_declarator_list_tag, std::vector<AST::InitDeclarator>>
     init_declarator_list("init_declarator_list");
 
-x3::rule<variable_initializer_tag, AST::VariableInitializer>
-    variable_initializer("variable_initializer");
-
 x3::rule<declaration_tag, AST::Declaration> declaration("declaration");
 
 x3::rule<struct _, std::string *>
@@ -113,6 +110,10 @@ x3::rule<identifier_list_tag, std::vector<std::string *>>
     identifier_list("identifier_list");
 
 x3::rule<statement_tag, AST::Statement> statement("statement");
+
+x3::rule<declaration_statement_or_function_tag,
+         AST::DeclarationStatementOrFunction>
+    declaration_statement_or_function("declaration_statement_or_function");
 
 x3::rule<compound_statement_tag, AST::CompoundStatement>
     compound_statement("compound_statement");

@@ -4,7 +4,9 @@
 namespace Interpreter {
 
 struct Closure {
-  
+
+private:
+  std::size_t m_continuation;
 };
 
 }

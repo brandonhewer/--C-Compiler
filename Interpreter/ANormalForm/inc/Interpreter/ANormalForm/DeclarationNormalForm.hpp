@@ -10,8 +10,7 @@ namespace Interpreter {
 namespace ANormalForm {
 
 template <typename Vector>
-void add_a_normal_variable_initializer(
-    VariableInitializer const &variable_initializer, Vector &output);
+void add_a_normal_declaration(Declaration const &declaration, Vector &output);
 
 std::pair<TypeSpecifier, StorageClassSpecifier> simplify_declaration_specifiers(
     std::vector<DeclarationSpecifier> const &declaration_specifiers);
@@ -184,13 +183,12 @@ void add_a_normal_init_declaration(TypeSpecifier const &type,
 }
 
 template <typename... Ts>
-void add_a_normal_variable_initializer(
-    VariableInitializer const &variable_initializer,
-    std::vector<Ts...> &output) {
+void add_a_normal_declaration(Declaration const &declaration,
+                              std::vector<Ts...> &output) {
   auto const specifiers =
-      simplify_declaration_specifiers(variable_initializer.specifiers);
+      simplify_declaration_specifiers(declaration.specifiers);
 
-  for (auto &&declarator : variable_initializer.declarators)
+  for (auto &&declarator : declaration.declarators)
     add_a_normal_init_declaration(specifiers.first, specifiers.second,
                                   declarator, output);
 }
@@ -213,12 +211,11 @@ std::pair<TypeSpecifier, StorageClassSpecifier> simplify_declaration_specifiers(
 }
 
 template <typename Vector>
-void add_a_normal_variable_initializer(
-    VariableInitializer const &variable_initializer, Vector &output) {
+void add_a_normal_declaration(Declaration const &declaration, Vector &output) {
   auto const specifiers =
-      simplify_declaration_specifiers(variable_initializer.specifiers);
+      simplify_declaration_specifiers(declaration.specifiers);
 
-  for (auto &&declarator : variable_initializer.declarators)
+  for (auto &&declarator : declaration.declarators)
     add_a_normal_init_declaration(specifiers.first, specifiers.second,
                                   declarator, output);
 }
