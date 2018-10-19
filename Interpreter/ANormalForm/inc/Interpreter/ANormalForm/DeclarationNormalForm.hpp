@@ -29,12 +29,13 @@ template <typename Vector> struct AddAssignmentTo {
 
   void operator()(VariableAssignment const &assignment) const {
     m_output.emplace_back(
-        VariableAssignment{m_identifier, Operand(assignment.variable)});
+        VariableAssignment{m_identifier, simplify_variable(assignment)});
   }
 
-  void operator()(TemporaryAssignment const &assignment) const {
+  void
+  operator()(std::unique_ptr<TemporaryAssignment> const &assignment) const {
     m_output.emplace_back(
-        VariableAssignment{m_identifier, simplify_temporary(assignment)});
+        VariableAssignment{m_identifier, simplify_temporary(assignment.get())});
   }
 
   template <typename T> void operator()(T const &) const {

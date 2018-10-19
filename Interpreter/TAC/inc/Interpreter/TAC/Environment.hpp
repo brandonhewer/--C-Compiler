@@ -21,6 +21,9 @@ class Environment {
   bool has_identifier_value(std::string *identifier) const;
   Value const &get_identifier_value(std::string *identifier) const;
 
+  void declare_variable(std::string *identifier, Value value);
+  void set_variable(std::string *identifier, Value value);
+
   template <typename... Ts> void push_frame(Ts... frame);
   void pop_frame();
 

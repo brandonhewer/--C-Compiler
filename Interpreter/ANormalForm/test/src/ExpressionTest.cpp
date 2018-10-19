@@ -8,15 +8,21 @@
 #include <streambuf>
 #include <string>
 
+#include <ctime>
+
 namespace {
+
+std::string get_string_from_file_at(std::string const &full_path) {
+  std::ifstream file_stream(full_path);
+  if (!file_stream)
+    throw std::runtime_error("No such file exists: " + full_path);
+  return std::string(std::istreambuf_iterator<char>(file_stream),
+                     std::istreambuf_iterator<char>());
+}
 
 std::string get_string_from_file(std::string const &file_name) {
   auto const path = std::string(TEST_PATH) + "/" + file_name;
-  std::ifstream file_stream(path);
-  if (!file_stream.good())
-    throw std::runtime_error("No such file exists: " + path);
-  return std::string(std::istreambuf_iterator<char>(file_stream),
-                     std::istreambuf_iterator<char>());
+  return get_string_from_file_at(path);
 }
 
 } // namespace
@@ -30,14 +36,11 @@ void ExpressionTest::SetUp() {}
 void ExpressionTest::TearDown() {}
 
 TEST(ExpressionTest, TEST_EMPTY_MAIN_FUNCTION_IS_PARSED) {
-  std::string const empty_main = get_string_from_file("main-test.c");
+  auto const empty_main = get_string_from_file("main.m2c");
   std::unordered_map<std::string, std::string> symbols;
+
   auto ast =
       Parser::parse_minus2c(empty_main.begin(), empty_main.end(), symbols);
-
-  std::cout << "Finished AST." << std::endl;
   auto normalised = Interpreter::ANormalForm::normalise_translation_unit(ast);
-
-  std::cout << "Finished Normalisation." << std::endl;
   std::cout << "Finished tree:\n" << normalised << std::endl;
 }

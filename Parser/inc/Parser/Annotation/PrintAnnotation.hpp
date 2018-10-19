@@ -22,7 +22,7 @@ struct print_annotation {
                          Context const &context) {
     using namespace Parser::AST;
     std::cout << "Succeeded in constructing " << m_id << "\n";
-    std::cout << "The abstract-syntax-tree representation is now:\n" << ast;
+    std::cout << "The component constructed was:\n" << ast;
     std::cout << "\n\n" << std::endl;
   }
 
@@ -46,6 +46,7 @@ private:
     name##_tag() : print_annotation(#name) {}                                  \
   };
 
-#define CREATE_PRINT_RULE(rule_name, rule_type) CREATE_PRINT_ANNOTATOR(rule_name) 
+#define CREATE_PRINT_RULE(rule_name, rule_type)                                \
+  CREATE_PRINT_ANNOTATOR(rule_name)
 
 #endif

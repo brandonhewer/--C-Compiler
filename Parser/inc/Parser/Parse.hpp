@@ -34,7 +34,7 @@ parse_minus2c(StartIt start_iterator, EndIt end_iterator,
               std::unordered_map<std::string, std::string> &symbols) {
   auto const parser = with<Grammar::symbol_map_tag>(
       std::ref(symbols))[Grammar::translation_unit];
-  auto const skipper = ascii::space | ("/*" >> (char_ - "*/") >> "*/");
+  auto const skipper = ("/*" >> *(char_ - "*/") >> "*/") | ascii::space;
   return parse_minus2c_with_skipper(parser, skipper, start_iterator,
                                     end_iterator);
 }

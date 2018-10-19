@@ -4,9 +4,11 @@
 #include <boost/spirit/home/x3/auxiliary.hpp>
 #include <boost/spirit/home/x3.hpp>
 
+#include "Parser/Grammar/Additive.hpp"
+#include "Parser/Grammar/Equality.hpp"
 #include "Parser/Grammar/Identifier.hpp"
-#include "Parser/Grammar/Keywords.hpp"
-#include "Parser/Grammar/Rules.hpp"
+#include "Parser/Grammar/Multiplicative.hpp"
+#include "Parser/Grammar/Relational.hpp"
 #include "Parser/Grammar/StringLiteral.hpp"
 #include "Parser/Grammar/Symbols.hpp"
 
@@ -24,84 +26,24 @@ auto const primary_expression_def
 ;
 
 auto const function_application_def
-= primary_expression >> argument_expression_lists
+= primary_expression >> "()" >> x3::attr(std::vector<AST::Expression>())
+| primary_expression >> argument_expression_lists
 ;
 
 auto const postfix_expression_def
 = function_application | primary_expression
 ;
 
-auto const argument_expression_list_def
+auto const argument_list_def
 = assignment_expression % COMMA
 ;
 
 auto const argument_expression_lists_def
-= +(LEFT_PAREN >> argument_expression_list >> RIGHT_PAREN)
+= +(LEFT_PAREN >> argument_list >> RIGHT_PAREN)
 ;
 
 auto const unary_expression_def
 = *unary_operator >> postfix_expression
-;
-
-auto const multiply_def
-= unary_expression >> STAR >> multiplicative_expression
-;
-
-auto const divide_def
-= unary_expression >> SLASH >> multiplicative_expression
-;
-
-auto const modulo_def
-= unary_expression >> PERCENT >> multiplicative_expression
-;
-
-auto const multiplicative_expression_def
-= multiply | divide | modulo | unary_expression
-;
-
-auto const addition_def
-= multiplicative_expression >> PLUS >> additive_expression
-;
-
-auto const subtraction_def
-= multiplicative_expression >> MINUS >> additive_expression
-;
-
-auto const additive_expression_def
-= addition | subtraction | multiplicative_expression
-;
-
-auto const less_than_def
-= additive_expression >> LT_OP >> relational_expression
-;
-
-auto const less_than_or_equal_to_def
-= additive_expression >> LE_OP >> relational_expression
-;
-
-auto const greater_than_def
-= additive_expression >> GT_OP >> relational_expression
-;
-
-auto const greater_than_or_equal_to_def
-= additive_expression >> GE_OP >> relational_expression
-;
-
-auto const relational_expression_def
-= less_than | less_than_or_equal_to | greater_than |
-  greater_than_or_equal_to | additive_expression
-;
-
-auto const equality_check_def
-= relational_expression >> EQ_OP >> equality_expression
-;
-
-auto const not_equal_def
-= relational_expression >> NE_OP >> equality_expression
-;
-
-auto const equality_expression_def
-= equality_check | not_equal | relational_expression
 ;
 
 auto const assignment_def
@@ -137,9 +79,8 @@ auto const declaration_specifiers_or_none_def
 ;
 
 auto const identifier_in_brackets_def
-= IDENTIFIER
-| LEFT_PAREN >> identifier_in_brackets >> RIGHT_PAREN
-| x3::eps >> x3::attr(nullptr)
+= LEFT_PAREN >> identifier_in_brackets >> RIGHT_PAREN
+| IDENTIFIER
 ;
 
 auto const init_declarator_def
@@ -247,23 +188,12 @@ BOOST_SPIRIT_DEFINE(
   primary_expression,
   function_application,
   postfix_expression,
-  argument_expression_list,
+  argument_list,
   argument_expression_lists,
   unary_expression,
-  multiply,
-  divide,
-  modulo,
   multiplicative_expression,
-  addition,
-  subtraction,
   additive_expression,
-  less_than,
-  less_than_or_equal_to,
-  greater_than,
-  greater_than_or_equal_to,
   relational_expression,
-  equality_check,
-  not_equal,
   equality_expression,
   assignment,
   assignment_expression,

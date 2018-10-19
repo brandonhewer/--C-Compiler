@@ -386,8 +386,10 @@ unary_operators_to_string(std::vector<UnaryOperators> const &unary_operators) {
 
 std::string
 unary_expression_to_string(UnaryExpression const &unary_expression) {
-  return unary_operators_to_string(unary_expression.operators) + " " +
-         postfix_expression_to_string(unary_expression.expression);
+  auto const suffix = postfix_expression_to_string(unary_expression.expression);
+  if (unary_expression.operators.empty())
+    return suffix;
+  return unary_operators_to_string(unary_expression.operators) + " " + suffix;
 }
 
 std::string multiplication_to_string(Multiplication const &multiplication) {
@@ -477,8 +479,13 @@ std::string assignment_expression_to_string(
 
 std::string
 function_application_to_string(FunctionApplication const &application) {
-  return primary_expression_to_string(application.identifier) + "(" +
-         expressions_to_string(application.argument_lists) + ")";
+  auto output = primary_expression_to_string(application.identifier);
+  if (application.argument_lists.empty())
+    return output + "()";
+
+  for (auto &&expression : application.argument_lists)
+    output += "(" + expression_to_string(expression) + ")";
+  return output;
 }
 
 std::string
@@ -931,6 +938,18 @@ std::ostream &operator<<(std::ostream &output_stream,
 std::ostream &operator<<(std::ostream &output_stream,
                          FunctionDefinition const &function_definition) {
   output_stream << function_definition_to_string(function_definition);
+  return output_stream;
+}
+
+std::ostream &operator<<(std::ostream &output_stream,
+                         FunctionDeclarator const &function_declarator) {
+  output_stream << function_declarator_to_string(function_declarator);
+  return output_stream;
+}
+
+std::ostream &operator<<(std::ostream &output_stream,
+                         FunctionApplication const &application) {
+  output_stream << function_application_to_string(application);
   return output_stream;
 }
 

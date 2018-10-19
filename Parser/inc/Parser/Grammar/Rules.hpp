@@ -20,8 +20,7 @@ x3::rule<postfix_expression_tag, AST::PostfixExpression>
 x3::rule<function_application_tag, AST::FunctionApplication>
     function_application("function_application");
 
-x3::rule<argument_expression_list_tag, AST::Expression>
-    argument_expression_list("argument_expression_list");
+x3::rule<argument_list_tag, AST::Expression> argument_list("argument_list");
 
 x3::rule<argument_expression_lists_tag, std::vector<AST::Expression>>
     argument_expression_lists("argument_expression_lists");
@@ -29,38 +28,14 @@ x3::rule<argument_expression_lists_tag, std::vector<AST::Expression>>
 x3::rule<unary_expression_tag, AST::UnaryExpression>
     unary_expression("unary_expression");
 
-x3::rule<multiply_tag, AST::Multiplication> multiply("multiply");
-
-x3::rule<divide_tag, AST::Division> divide("divide");
-
-x3::rule<modulo_tag, AST::Modulo> modulo("modulo");
-
 x3::rule<multiplicative_expression_tag, AST::MultiplicativeExpression>
     multiplicative_expression("multiplicative_expression");
-
-x3::rule<addition_tag, AST::Addition> addition("addition");
-
-x3::rule<subtraction_tag, AST::Subtraction> subtraction("subtraction");
-
-x3::rule<less_than_tag, AST::LessThan> less_than("less_than");
-
-x3::rule<less_than_or_equal_to_tag, AST::LessThanOrEqualTo>
-    less_than_or_equal_to("less_than_or_equal_to");
-
-x3::rule<greater_than_tag, AST::GreaterThan> greater_than("greater_than");
-
-x3::rule<greater_than_or_equal_to_tag, AST::GreaterThanOrEqualTo>
-    greater_than_or_equal_to("greater_than_or_equal_to");
 
 x3::rule<additive_expression_tag, AST::AdditiveExpression>
     additive_expression("additive_expression");
 
 x3::rule<relational_expression_tag, AST::RelationalExpression>
     relational_expression("relational_expression");
-
-x3::rule<equality_check_tag, AST::Equals> equality_check("equality_check");
-
-x3::rule<not_equal_tag, AST::NotEqual> not_equal("not_equal");
 
 x3::rule<equality_expression_tag, AST::EqualityExpression>
     equality_expression("equality_expression");

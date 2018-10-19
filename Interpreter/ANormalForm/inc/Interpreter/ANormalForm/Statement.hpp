@@ -38,8 +38,8 @@ struct NormalFunctionDefinition {
 using NormalStatement =
     std::variant<NormalIf, NormalIfElse, NormalWhile, NormalReturn,
                  Parser::AST::JumpKeywords, VariableAssignment,
-                 TemporaryAssignment, VariableDeclaration, FunctionDeclaration,
-                 NormalFunctionDefinition,
+                 std::unique_ptr<TemporaryAssignment>, VariableDeclaration,
+                 FunctionDeclaration, NormalFunctionDefinition,
                  std::unique_ptr<NormalCompoundStatement>>;
 
 struct NormalCompoundStatement {

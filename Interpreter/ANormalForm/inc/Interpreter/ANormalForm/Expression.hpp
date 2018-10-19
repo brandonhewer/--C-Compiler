@@ -1,5 +1,5 @@
-#ifndef __EXPRESSION_HPP_
-#define __EXPRESSION_HPP_
+#ifndef __ANORMAL_EXPRESSION_HPP_
+#define __ANORMAL_EXPRESSION_HPP_
 
 #include "Parser/AST/Expression.hpp"
 
@@ -47,6 +47,7 @@ using Operation =
     std::variant<UnaryOperation, BinaryOperation, FunctionCall, Operand>;
 
 struct TemporaryAssignment {
+  TemporaryAssignment(Operation exp) : expression(std::move(exp)) {}
   Operation expression;
 };
 
@@ -55,8 +56,54 @@ struct VariableAssignment {
   Operation expression;
 };
 
-int evaluate_binary_expression(BinaryOperators op, int lhs, int rhs);
-int evaluate_unary_expression(Parser::AST::UnaryOperators op, int operand);
+template <typename T> T operand_to_constant(Operand const &operand) {
+  try {
+    return std::get<T>(operand);
+  } catch (std::bad_variant_access &) {
+    throw std::runtime_error("operand is not of the correct constant type.");
+  }
+}
+
+template <typename T> struct OperationToConstant {
+  T operator()(Operand const &operand) const {
+    return operand_to_constant<T>(operand);
+  }
+
+  T operator()(UnaryOperation const &) {
+    throw std::runtime_error("temporary is a unary operation");
+  }
+
+  T operator()(BinaryOperation const &) {
+    throw std::runtime_error("temporary is a binary operation");
+  }
+
+  T operator()(FunctionCall const &) {
+    throw std::runtime_error("temporary is a function call");
+  }
+};
+
+std::string *temporary_to_variable(TemporaryAssignment const *);
+
+Operand simplify_temporary(TemporaryAssignment const *);
+Operand simplify_variable(VariableAssignment const &);
+Operation create_simplified_binary(BinaryOperators, TemporaryAssignment const *,
+                                   VariableAssignment const &);
+Operation create_simplified_binary(BinaryOperators, VariableAssignment const &,
+                                   TemporaryAssignment const *);
+Operation create_simplified_binary(BinaryOperators, VariableAssignment const &,
+                                   VariableAssignment const &);
+Operation create_simplified_binary(BinaryOperators, TemporaryAssignment const *,
+                                   TemporaryAssignment const *);
+
+std::vector<Parser::AST::UnaryOperators> simplify_unary_operators(
+    std::vector<Parser::AST::UnaryOperators> const &operators);
+
+int evaluate_unary_constant(
+    std::vector<Parser::AST::UnaryOperators> const &operators,
+    VariableAssignment const &);
+int evaluate_unary_constant(
+    std::vector<Parser::AST::UnaryOperators> const &operators,
+    TemporaryAssignment const *);
 
 } // namespace ANormalForm
 } // namespace Interpreter

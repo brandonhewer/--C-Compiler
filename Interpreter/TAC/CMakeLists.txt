@@ -1,16 +1,16 @@
-add_library(--CTAC
+add_library(Minus2CTAC
   src/Environment.cpp
   src/PrintTAC.cpp
 )
 
-target_include_directories(--CTAC
+target_include_directories(Minus2CTAC
   PUBLIC
     inc
 )
 
-target_link_libraries(--CTAC
+target_link_libraries(Minus2CTAC
   PUBLIC
-    --CParser
+  Minus2CParser
     ANormalForm
 )
 

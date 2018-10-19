@@ -89,13 +89,13 @@ std::string temporary_to_string(TemporaryAssignment const *assignment) {
   std::ostringstream address;
   address << (void const *)assignment;
   std::string address_string = address.str();
-  return "free(" + address_string + ")";
+  return "free_" + address_string;
 }
 
 struct OperandToString {
 
   std::string operator()(std::string *identifier) const {
-    if (nullptr == identifier)
+    if (nullptr != identifier)
       return *identifier;
     return "";
   }
@@ -126,8 +126,8 @@ struct FunctionIdentifierToString {
 
   std::string operator()(std::string *identifier) const {
     if (nullptr == identifier)
-      return *identifier;
-    return "";
+      return "";
+    return *identifier;
   }
 
   std::string operator()(TemporaryAssignment const *assignment) const {
@@ -141,12 +141,17 @@ std::string function_identifier_to_string(
   return std::visit(FunctionIdentifierToString(), function_identifier);
 }
 
+std::string function_argument_to_string(Operand const &argument) {
+  return operand_to_string(argument);
+}
+
 std::string
 function_arguments_to_string(std::vector<Operand> const &arguments) {
   std::vector<std::string> operand_strings;
   operand_strings.reserve(arguments.size());
   std::transform(arguments.begin(), arguments.end(),
-                 std::back_inserter(operand_strings), operand_to_string);
+                 std::back_inserter(operand_strings),
+                 function_argument_to_string);
   return boost::algorithm::join(operand_strings, ",");
 }
 
@@ -244,8 +249,10 @@ std::string compound_statement_to_string(NormalCompoundStatement const &,
 std::string if_to_string(NormalIf const &if_statement, std::size_t indents) {
   auto const condition =
       "if (" + operand_to_string(if_statement.condition) + ")";
-  return condition + "\n" +
-         compound_statement_to_string(*if_statement.body, indents + 1);
+  auto const indentation = std::string(INDENT * indents, ' ');
+  return condition + " {\n" +
+         compound_statement_to_string(*if_statement.body, indents + 1) + "\n" +
+         indentation + "}";
 }
 
 std::string if_else_to_string(NormalIfElse const &if_else,
@@ -318,8 +325,9 @@ struct NormalStatementToString {
     return m_prefix + variable_assignment_to_string(assignment);
   }
 
-  std::string operator()(TemporaryAssignment const &assignment) const {
-    return m_prefix + temporary_assignment_to_string(assignment);
+  std::string
+  operator()(std::unique_ptr<TemporaryAssignment> const &assignment) const {
+    return m_prefix + temporary_assignment_to_string(*assignment);
   }
 
   std::string operator()(VariableDeclaration const &declaration) const {
@@ -336,7 +344,7 @@ struct NormalStatementToString {
 
   std::string
   operator()(std::unique_ptr<NormalCompoundStatement> const &statement) const {
-    return m_prefix + "{" +
+    return m_prefix + "{\n" +
            compound_statement_to_string(*statement, m_indents + 1) + "\n" +
            m_prefix + "}";
   }

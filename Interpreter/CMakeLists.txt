@@ -1,13 +1,13 @@
 add_subdirectory(ANormalForm)
 
 add_custom_target(
-  --CInterpreter
+  Minus2CInterpreter
     DEPENDS
       ANormalForm
 )
 
 add_custom_target(
-  --CInterpreterTests
+  Minus2CInterpreterTest
     DEPENDS
       ANormalFormTest
 )

@@ -1,0 +1,10 @@
+
+int f() {
+  int a = b / 2;
+  
+  f(h * 6 * 8 * 7);
+
+  if (2 * 2)
+    if (a * c)
+      return 3;
+}

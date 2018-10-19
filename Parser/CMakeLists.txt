@@ -1,6 +1,6 @@
-add_library(--CParser INTERFACE)
+add_library(Minus2CParser INTERFACE)
 
-target_include_directories(--CParser
+target_include_directories(Minus2CParser
   INTERFACE
     inc
     ${Boost_INCLUDE_DIRS}
@@ -8,7 +8,7 @@ target_include_directories(--CParser
 
 add_subdirectory(test)
 
-target_link_libraries(--CParser
+target_link_libraries(Minus2CParser
   INTERFACE
     ${Boost_LIBRARIES}
 )

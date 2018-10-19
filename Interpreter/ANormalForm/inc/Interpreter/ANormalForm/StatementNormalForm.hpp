@@ -31,12 +31,12 @@ using namespace Interpreter::ANormalForm;
 using namespace Parser::AST;
 
 struct ExtractOperand {
-  Operand operator()(TemporaryAssignment const &temporary) {
-    return &temporary;
+  Operand operator()(std::unique_ptr<TemporaryAssignment> const &temporary) {
+    return simplify_temporary(temporary.get());
   }
 
   Operand operator()(VariableAssignment const &assignment) {
-    return assignment.variable;
+    return simplify_variable(assignment);
   }
 
   template <typename T> Operand operator()(T const &) {
@@ -167,6 +167,50 @@ void add_a_normal_declaration_statement_or_function(
                        declaration_statement_or_function);
 }
 
+struct CreateCompoundStatement
+    : public boost::static_visitor<std::unique_ptr<NormalCompoundStatement>> {
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(CompoundStatement const &compound_statement) {
+    return create_a_normal_compound_statement(compound_statement);
+  }
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(Expression const &expression) const {
+    auto compound_statement = std::make_unique<NormalCompoundStatement>();
+    add_a_normal_expression(expression, compound_statement->statements);
+    return std::move(compound_statement);
+  }
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(If const &if_statement) const {
+    auto compound_statement = std::make_unique<NormalCompoundStatement>();
+    add_a_normal_if(if_statement, compound_statement->statements);
+    return std::move(compound_statement);
+  }
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(IfElse const &if_else) const {
+    auto compound_statement = std::make_unique<NormalCompoundStatement>();
+    add_a_normal_if_else(if_else, compound_statement->statements);
+    return std::move(compound_statement);
+  }
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(While const &while_statement) const {
+    auto compound_statement = std::make_unique<NormalCompoundStatement>();
+    add_a_normal_while(while_statement, compound_statement->statements);
+    return std::move(compound_statement);
+  }
+
+  std::unique_ptr<NormalCompoundStatement>
+  operator()(JumpStatement const &jump_statement) const {
+    auto compound_statement = std::make_unique<NormalCompoundStatement>();
+    add_a_normal_jump_statement(jump_statement, compound_statement->statements);
+    return std::move(compound_statement);
+  }
+} create_compound_statement_;
+
 } // namespace
 
 namespace Interpreter {
@@ -196,9 +240,7 @@ void add_a_normal_statement(Parser::AST::Statement const &statement,
 
 std::unique_ptr<NormalCompoundStatement>
 create_a_normal_compound_statement(Parser::AST::Statement const &statement) {
-  auto normal_statement = std::make_unique<NormalCompoundStatement>();
-  add_a_normal_statement(statement, normal_statement->statements);
-  return std::move(normal_statement);
+  return boost::apply_visitor(create_compound_statement_, statement);
 }
 
 std::unique_ptr<NormalCompoundStatement> create_a_normal_compound_statement(

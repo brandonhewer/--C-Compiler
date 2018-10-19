@@ -1,17 +1,17 @@
-add_executable(ANormalFormTest
+add_executable(Minus2CANormalFormTest
   src/main.cpp
   src/ExpressionTest.cpp
 )
 
-target_include_directories(ANormalFormTest PRIVATE inc)
+target_include_directories(Minus2CANormalFormTest PRIVATE inc)
 
-target_link_libraries(ANormalFormTest
+target_link_libraries(Minus2CANormalFormTest
   PUBLIC
-    ANormalForm
+  Minus2CANormalForm
     gtest_main
 )
 
-target_compile_definitions(ANormalFormTest 
-  PRIVATE TEST_PATH="${CMAKE_SOURCE_DIR}/test-data")
+target_compile_definitions(Minus2CANormalFormTest 
+  PRIVATE TEST_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test-data")
 
-add_test(NAME ANormalFormTest COMMAND ANormalFormTest)
+add_test(NAME Minus2CANormalFormTest COMMAND Minus2CANormalFormTest)
