@@ -95,6 +95,9 @@ Operation create_simplified_binary(BinaryOperators, VariableAssignment const &,
 Operation create_simplified_binary(BinaryOperators, TemporaryAssignment const *,
                                    TemporaryAssignment const *);
 
+int evaluate_binary(BinaryOperators op, int, int);
+int evaluate_unary(Parser::AST::UnaryOperators op, int);
+
 std::vector<Parser::AST::UnaryOperators> simplify_unary_operators(
     std::vector<Parser::AST::UnaryOperators> const &operators);
 

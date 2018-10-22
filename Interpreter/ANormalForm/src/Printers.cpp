@@ -208,10 +208,12 @@ variable_declaration_to_string(VariableDeclaration const &declaration) {
 std::string function_parameter_to_string(VariableDeclaration const &parameter) {
   auto const storage_class = storage_class_to_string(parameter.storage_class);
   auto const type = type_to_string(parameter.type);
+  auto const suffix =
+      nullptr == parameter.name ? type : type + " " + *parameter.name;
 
   if (storage_class.empty())
-    return type + " " + *parameter.name;
-  return storage_class + " " + type + " " + *parameter.name;
+    return suffix;
+  return storage_class + suffix;
 }
 
 std::string function_parameters_to_string(
@@ -221,7 +223,7 @@ std::string function_parameters_to_string(
   std::transform(parameters.begin(), parameters.end(),
                  std::back_inserter(parameter_strings),
                  function_parameter_to_string);
-  return boost::algorithm::join(parameter_strings, ",");
+  return boost::algorithm::join(parameter_strings, ", ");
 }
 
 std::string
@@ -258,8 +260,10 @@ std::string if_to_string(NormalIf const &if_statement, std::size_t indents) {
 std::string if_else_to_string(NormalIfElse const &if_else,
                               std::size_t indents) {
   auto const if_string = if_to_string(if_else.if_statement, indents);
-  return if_string + "\nelse\n" +
-         compound_statement_to_string(*if_else.else_body, indents + 1);
+  auto const indentation = std::string(INDENT * indents, ' ');
+  return if_string + " else {\n" +
+         compound_statement_to_string(*if_else.else_body, indents + 1) + "\n" +
+         indentation + "}";
 }
 
 std::string while_to_string(NormalWhile const &while_statement,

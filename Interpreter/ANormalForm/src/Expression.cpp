@@ -252,6 +252,14 @@ Operation create_simplified_binary(BinaryOperators op,
   }
 }
 
+int evaluate_binary(BinaryOperators op, int lhs, int rhs) {
+  return evaluate_constant(op, lhs, rhs);
+}
+
+int evaluate_unary(UnaryOperators op, int operand) {
+  return evaluate_constant(op, operand);
+}
+
 std::vector<UnaryOperators>
 simplify_unary_operators(std::vector<UnaryOperators> const &operators) {
   bool switch_sign = false;

@@ -98,7 +98,7 @@ struct StatementHasNoSemantics {
 
   bool operator()(NormalFunctionDefinition const &function_definition) {
     remove_statements_with_no_semantics(*function_definition.body);
-    return function_definition.body->statements.empty();
+    return false;
   }
 
 } statement_has_no_semantics_;

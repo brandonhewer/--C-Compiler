@@ -1,0 +1,30 @@
+int b = 5 * 100;
+int a = b * 2;
+
+int test() {
+  return a;
+}
+
+int main() {
+  int a = b * 6;
+  int c = a * a;
+
+  int foo(int x) {
+    int c = x;
+  }
+
+  int x = foo(2);
+  return test();
+}
+
+int g() {
+  return 5;
+}
+
+function h() {
+  int xyz() {
+    int c = 5;
+    return c;
+  }
+  return xyz;
+}

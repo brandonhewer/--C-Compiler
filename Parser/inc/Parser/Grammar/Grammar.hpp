@@ -26,8 +26,7 @@ auto const primary_expression_def
 ;
 
 auto const function_application_def
-= primary_expression >> "()" >> x3::attr(std::vector<AST::Expression>())
-| primary_expression >> argument_expression_lists
+= primary_expression >> argument_expression_lists
 ;
 
 auto const postfix_expression_def
@@ -38,8 +37,12 @@ auto const argument_list_def
 = assignment_expression % COMMA
 ;
 
+auto const empty_argument_expression
+= x3::eps >> x3::attr(AST::Expression())
+;
+
 auto const argument_expression_lists_def
-= +(LEFT_PAREN >> argument_list >> RIGHT_PAREN)
+= +(LEFT_PAREN >> (argument_list | empty_argument_expression) >> RIGHT_PAREN)
 ;
 
 auto const unary_expression_def
@@ -125,8 +128,8 @@ auto const parameter_type_list_brackets
 auto const statement_def
 = compound_statement
 | expression_statement
-| if_statement
 | if_else_statement
+| if_statement
 | iteration_statement
 | jump_statement
 ;

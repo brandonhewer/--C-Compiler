@@ -68,7 +68,7 @@ auto const gt_relation = GT_OP >> x3::attr(Relation::GT);
 auto const lte_relation = LE_OP >> x3::attr(Relation::LTE);
 auto const gte_relation = GE_OP >> x3::attr(Relation::GTE);
 
-auto const relation = lt_relation | gt_relation | lte_relation | gte_relation;
+auto const relation = lte_relation | gte_relation | lt_relation | gt_relation;
 auto const relational_helper = x3::rule<struct _, RelationalHelper>{} =
     additive_expression >> relation >> relational_expression;
 

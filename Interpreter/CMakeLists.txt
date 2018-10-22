@@ -1,4 +1,5 @@
 add_subdirectory(ANormalForm)
+add_subdirectory(TAC)
 
 add_custom_target(
   Minus2CInterpreter
